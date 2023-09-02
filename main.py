@@ -4,7 +4,7 @@ import os.path
 import urllib.request
 import csv
 
-def main(url, folder_name, csv_file_name):
+def main(url, folder_name, csv_file_name,title):
     response = requests.get(url)
     response.encoding = 'utf-8'
     text = response.text
@@ -24,12 +24,14 @@ def main(url, folder_name, csv_file_name):
         if match:
             idens.append(match.group(1))
 
+    titles = []
     imgs = []
     for item in result3:
         start_index = item.index('"') + 1
         end_index = item.index('"', start_index)
         img = "https://sdmda.bupt.edu.cn/" + item[start_index:end_index]
         imgs.append(img)
+        titles.append(title)
 
     folder_path = os.path.join(os.getcwd(), folder_name)
     if not os.path.exists(folder_path):
@@ -40,14 +42,14 @@ def main(url, folder_name, csv_file_name):
         save_path = os.path.join(folder_path, filename)
         urllib.request.urlretrieve(item, save_path)
 
-    csv_data = zip(names, idens, imgs)
+    csv_data = zip(names, idens, titles, imgs)
     csv_file = os.path.join(folder_path, csv_file_name)
     with open(csv_file, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(['Name', 'Department', 'Image'])
+        writer.writerow(['Name', 'Department', 'Title', 'Image'])
         writer.writerows(csv_data)
 
 
-main("https://sdmda.bupt.edu.cn/szdw/js.htm", "数媒院教授信息", "professors_information.csv")
-main("https://sdmda.bupt.edu.cn/szdw/fjs.htm", "数媒副教授信息", "associate professor_information.csv")
-main("https://sdmda.bupt.edu.cn/szdw/js1.htm", "数媒院讲师信息", "lecturer_information.csv")
+main("https://sdmda.bupt.edu.cn/szdw/js.htm", "数媒院教授信息", "professors_information.csv","教授")
+main("https://sdmda.bupt.edu.cn/szdw/fjs.htm", "数媒副教授信息", "associate professor_information.csv","副教授")
+main("https://sdmda.bupt.edu.cn/szdw/js1.htm", "数媒院讲师信息", "lecturer_information.csv","讲师")
